@@ -7,6 +7,7 @@
 <body>
 <script src="three.min.js"></script>
 <script src="OrbitControls.js"></script>
+<script src="OBJLoader.js"></script>
 <script>
     /**
      * 三维场景的基本要素：
@@ -21,6 +22,13 @@
     var material = new THREE.MeshLambertMaterial({color: 0xff0000});
     var mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
+
+    var loader = new THREE.OBJLoader();
+    loader.load('obj/threeobj.obj', function (obj) {
+        obj.position.set(55, 55, 55);
+        obj.scale.set(15,15,15);
+        scene.add(obj)
+    });
 
     var light = new THREE.PointLight(0xffffff);
     light.position.set(300, 400, 200);
@@ -39,10 +47,15 @@
     function render() {
         renderer.render(scene, camera);
     }
-    render();
 
     var controls = new THREE.OrbitControls(camera);
-    controls.addEventListener('change', render)
+    controls.addEventListener('change', render);
+    
+    function animate() {
+        requestAnimationFrame(animate);
+        render();
+    }
+    animate();
 </script>
 </body>
 </html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="MTLLoader.js"></script>
+<script src="OBJLoader.js"></script>
+<script>
+    /**
+     * 三维场景的基本要素：
+     *  场景(Scene):模型，灯光等
+     *  相机(Camera):观察场景的视角
+     *  渲染器(Renderer):场景渲染输出的目标
+     *  渲染(render):执行渲染操作
+     */
+    var scene = new THREE.Scene();
+
+    var geometry = new THREE.BoxGeometry(100, 100, 100);
+    var material = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        map: new THREE.ImageUtils.loadTexture('cube/posx.jpg')
+    });
+    var mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+
+    var textureCube = new THREE.CubeTextureLoader()
+        .setPath( 'cube/')
+        .load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+    scene.background = textureCube;
+
+    var loader2 = new THREE.MTLLoader();
+    loader2.load('obj/threeobj.mtl',function (material) {
+        material.preload();
+
+        var objLoader = new THREE.OBJLoader();
+        objLoader.setMaterials( material );
+        objLoader.load('obj/threeobj.obj',function (obj) {
+            obj.position.set(55, 55, 55);
+            obj.scale.set(10,10,10);
+            scene.add(obj)
+        });
+
+    });
+
+    var light = new THREE.PointLight(0xffffff);
+    light.position.set(300, 400, 200);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x333333));
+
+    var camera = new THREE.PerspectiveCamera(40, 800 / 600, 1, 10000);
+    camera.position.set(200, 200, 200);
+    camera.lookAt(0, 0, 0);
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(800, 600);
+    document.body.appendChild(renderer.domElement);
+
+
+    function render() {
+        renderer.render(scene, camera);
+    }
+
+    var controls = new THREE.OrbitControls(camera);
+    controls.addEventListener('change', render);
+    
+    function animate() {
+        requestAnimationFrame(animate);
+        render();
+    }
+    animate();
+</script>
+</body>
+</html>
